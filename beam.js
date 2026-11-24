@@ -66,3 +66,47 @@ export function gaussianSolve(A,b){
   }
   return aug.map(row=>row[n]);
 }
+
+export function pointLoadResponse({ length, loadKN, loadPosition, eModulus = 200, inertiaMillion = 85, damageLocation = 0.62, damageSeverity = 0 }) {
+  const E = eModulus * 1e9;
+  const I = inertiaMillion * 1e-6;
+  const P = loadKN * 1000;
+  const a = loadPosition * length;
+  const b = length - a;
+  const points = [];
+  const n = 80;
+
+  for (let i = 0; i <= n; i++) {
+    const x = i / n * length;
+    const EI = E * I;
+    let deflection;
+    if (x <= a) {
+      deflection = P * b * x / (6 * EI * length) *
+        (length * length - b * b - x * x);
+    } else {
+      deflection = P * a * (length - x) / (6 * EI * length) *
+        (length * length - a * a - (length - x) * (length - x));
+    }
+
+    const damageOffset = (x / length - damageLocation);
+    const damageFactor = damageSeverity / 100 * Math.exp(-(damageOffset * damageOffset) / 0.0018);
+    const damagedDeflection = deflection * (1 + damageFactor * 5);
+
+    const moment = x <= a ? P * b * x / length : P * a * (length - x) / length;
+    points.push({ x, deflection: -damagedDeflection * 1000, baseline: -deflection * 1000, moment });
+  }
+
+  const maxDeflection = Math.max(...points.map((point) => Math.abs(point.deflection)));
+  const maxMoment = Math.max(...points.map((point) => point.moment));
+  const sectionDepth = 0.30;
+  const sectionModulus = I / (sectionDepth / 2);
+  const peakStress = maxMoment / sectionModulus / 1e6;
+  const residualStiffness = 100 - damageSeverity * 0.62;
+  const anomalyMax = Math.max(...points.map((point) =>
+    Math.abs(point.deflection - point.baseline)
+  ));
+  const confidence = damageSeverity === 0 ? 12 :
+    Math.min(99, 58 + damageSeverity * 1.4 + Math.min(anomalyMax, 8) * 2);
+
+  return { points, maxDeflection, maxMoment, peakStress, residualStiffness, confidence };
+}

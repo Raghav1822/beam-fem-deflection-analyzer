@@ -8,25 +8,26 @@
 </head>
 <body>
   <main>
-    <header><div><p class="eyebrow">Structural Engineering Portfolio Project</p><h1>Simply Supported Beam FEM</h1></div><span class="badge">Euler-Bernoulli</span></header>
+    <header><div><p class="eyebrow">Structural Digital Twin</p><h1>Bridge Load-Test Monitor</h1></div><span id="systemStatus" class="badge">SIMULATION LIVE</span></header>
     <section class="dashboard">
       <aside class="panel controls">
-        <h2>Beam properties</h2>
-        <label>Length <output id="lengthOut">6</output> m</label><input id="length" type="range" min="2" max="12" step="0.1" value="6" />
-        <label>Distributed load <output id="loadOut">18</output> kN/m</label><input id="load" type="range" min="0" max="60" step="1" value="18" />
-        <label>Young's modulus <output id="modulusOut">200</output> GPa</label><input id="modulus" type="range" min="70" max="210" step="10" value="200" />
-        <label>Moment of inertia <output id="inertiaOut">85</output> ×10⁶ mm⁴</label><input id="inertia" type="range" min="20" max="200" step="5" value="85" />
-        <label>Elements <output id="elementsOut">20</output></label><input id="elements" type="range" min="4" max="40" step="2" value="20" />
+        <h2>Proof-load scenario</h2>
+        <label>Vehicle load <output id="vehicleOut">160</output> kN</label><input id="vehicle" type="range" min="40" max="300" step="5" value="160" />
+        <label>Scan speed <output id="speedOut">1.0</output>×</label><input id="speed" type="range" min="0.2" max="2.5" step="0.1" value="1" />
+        <label>Damage severity <output id="damageOut">18</output>% EI loss</label><input id="damage" type="range" min="0" max="50" step="1" value="18" />
+        <label>Damage location <output id="damageLocationOut">62</output>% span</label><input id="damageLocation" type="range" min="10" max="90" step="1" value="62" />
+        <div class="playback"><button id="playBtn" class="primary">Pause scan</button><button id="resetBtn">Reset</button></div>
         <div class="metric-grid">
-          <article><span>Max deflection</span><strong id="deflection">--</strong></article>
-          <article><span>Max moment</span><strong id="moment">--</strong></article>
-          <article><span>Max shear</span><strong id="shear">--</strong></article>
-          <article><span>Tip rotation</span><strong id="rotation">--</strong></article>
+          <article><span>Current deflection</span><strong id="deflection">--</strong></article>
+          <article><span>Peak stress</span><strong id="stress">--</strong></article>
+          <article><span>Residual stiffness</span><strong id="stiffness">--</strong></article>
+          <article><span>Damage confidence</span><strong id="confidence">--</strong></article>
         </div>
       </aside>
       <section class="panel plots">
-        <canvas id="deflectionCanvas" width="860" height="250" aria-label="Beam deflection plot"></canvas>
-        <canvas id="momentCanvas" width="860" height="250" aria-label="Bending moment plot"></canvas>
+        <div class="scan-head"><div><span>LIVE SENSOR ARRAY</span><strong id="vehiclePosition">Vehicle at 0% span</strong></div><div class="health"><span>Structural health</span><strong id="healthValue">96.8%</strong></div></div>
+        <canvas id="twinCanvas" width="860" height="420" aria-label="Animated beam load-test digital twin"></canvas>
+        <div class="legend"><span><i class="dot healthy"></i>Baseline response</span><span><i class="dot measured"></i>Live deflection</span><span><i class="dot damage"></i>Damage region</span></div>
       </section>
     </section>
   </main>
